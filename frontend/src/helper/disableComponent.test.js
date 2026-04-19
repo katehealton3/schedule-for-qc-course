@@ -100,4 +100,48 @@ describe('setDisabledSaveButtonSemester function', () => {
             ).toBeFalsy();
         });
     });
+
+    describe('uncovered branches', () => {
+        const pristine = true;
+        const submitting = false;
+
+        it('should return true when semester has no id (falls to base case)', () => {
+            const semesterWithoutId = {
+                description: 'no id semester',
+                semester_groups: [],
+            };
+            expect(
+                setDisabledSaveButtonSemester(pristine, submitting, semesterWithoutId, []),
+            ).toBeTruthy();
+        });
+
+        it('should return false when selectedGroups is empty and semester_groups is not empty', () => {
+            expect(
+                setDisabledSaveButtonSemester(false, false, semester, []),
+            ).toBeFalsy();
+        });
+
+        it('should return false when a group is deleted (selectedGroups is subset of semester_groups)', () => {
+            const semesterWithTwoGroups = {
+                ...semester,
+                semester_groups: [
+                    { id: 52 },
+                    { id: 99 },
+                ],
+            };
+            expect(
+                setDisabledSaveButtonSemester(false, false, semesterWithTwoGroups, [{ id: 52 }]),
+            ).toBeFalsy();
+        });
+
+        it('should return true when semester_groups is empty and selectedGroups is also empty', () => {
+            const semesterEmptyGroups = {
+                ...semester,
+                semester_groups: [],
+            };
+            expect(
+                setDisabledSaveButtonSemester(pristine, submitting, semesterEmptyGroups, []),
+            ).toBeFalsy();
+        });
+    });
 });
