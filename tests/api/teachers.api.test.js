@@ -3,7 +3,6 @@ const axios = require('axios');
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
 const api = axios.create({ baseURL: BASE_URL });
 
-// Suppress axios throwing on non-2xx so we can assert manually
 api.interceptors.response.use(
     (res) => res,
     (err) => Promise.resolve(err.response),
