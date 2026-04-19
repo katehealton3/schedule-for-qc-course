@@ -1,0 +1,355 @@
+{
+  "info": {
+    "name": "Schedule API Tests",
+    "_postman_id": "schedule-api-tests-collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Teachers",
+      "item": [
+        {
+          "name": "GET All Teachers",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/teachers"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response is array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Teacher by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/teachers/{{teacherId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Teacher has id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Teacher",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/teachers",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"{{teacherName}}\",\"surname\":\"{{teacherSurname}}\",\"patronymic\":\"{{teacherPatronymic}}\",\"position\":\"доцент\",\"department\":{\"id\":1}}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.environment.set('teacherName', 'Name' + ts);",
+                  "pm.environment.set('teacherSurname', 'Surname' + ts);",
+                  "pm.environment.set('teacherPatronymic', 'Patron' + ts);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns created teacher with id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.environment.set('teacherId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT Update Teacher",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/teachers",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":{{teacherId}},\"name\":\"Updated\",\"surname\":\"UpdatedSurname\",\"patronymic\":\"UpdatedPat\",\"position\":\"професор\",\"department\":{\"id\":1}}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Name is updated', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.name).to.eql('Updated');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Teacher",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/teachers/{{teacherId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response is truthy', () => {",
+                  "  pm.expect(pm.response.text()).to.not.be.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Non-existing Teacher (404)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/teachers/999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Error message present', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Subjects",
+      "item": [
+        {
+          "name": "GET All Subjects",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/subjects"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response is array', () => {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Subject",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/subjects",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"{{subjectName}}\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set('subjectName', 'Subject' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Subject has id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.environment.set('subjectId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Subject by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/subjects/{{subjectId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Subject has name', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('name');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Non-existing Subject (404)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/subjects/999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Error body present', () => {",
+                  "  pm.expect(pm.response.json()).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lessons",
+      "item": [
+        {
+          "name": "GET All Lessons",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/lessons"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response is array', () => {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Lesson",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/lessons",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"hours\":2,\"lessonType\":\"LECTURE\",\"subjectForSite\":\"{{subjectName}}\",\"teacherForSite\":\"Test Teacher\",\"teacher\":{\"id\":{{teacherId}}},\"subject\":{\"id\":{{subjectId}}},\"group\":{\"id\":{{groupId}}}}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Lesson has id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.environment.set('lessonId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Lesson by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/lessons/{{lessonId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Lesson has lessonType', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('lessonType');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Non-existing Lesson (404)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/lessons/999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Error message present', () => {",
+                  "  pm.expect(pm.response.json()).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
